@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mybatis.mapper.UserMapper">
+    <!--传递包装对象类型-->
+    <select id="findUserByQueryVo" parameterType="queryvo" resultType="user">
+        select * from user where username like '%${user.username}%'
+    </select>
+
+    <!--获取用户列表总数-->
+    <select id="findUserCount" resultType="int">
+        select count(*) from user
+    </select>
+
+    <!--动态sql拼接-->
+    <select id="findUserList" parameterType="user" resultType="user">
+        select * from user
+        <where>
+            <if test="id!=null and id!=''">
+                and id=#{id}
+            </if>
+            <if test="username!=null and username!=''">
+                and username like '%${username}%'
+            </if>
+        </where>
+    </select>
+
+    <!--多个id查询用户-->
+    <select id="findUserListByQueryVo" parameterType="queryvo" resultType="user">
+        <include refid="select_*_from_user"></include>
+        <where>
+            <if test="ids!=null">
+                <foreach collection="ids" open="and id in (" close=")" item="id" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <!--抽取重复片段-->
+    <sql id="select_*_from_user">
+        select * from user
+    </sql>
+    <!--set的使用-->
+    <update id="updateByIF" parameterType="user">
+        update user
+        <set>
+            <if test="username!=null and username!=''">
+                username=#{username},
+            </if>
+            <if test="sex!=null and sex!=''">
+                sex=#{sex},
+            </if>
+        </set>
+        <where>
+            id=#{id}
+        </where>
+    </update>
+
+    <!--查询用户名下的订单-->
+    <select id="findUserOrdersListResultMap" resultMap="resultMap_user_ordersList">
+        SELECT
+        u.id ,
+        u.username ,
+        u.birthday ,
+        u.sex ,
+        u.address ,
+        o.id as oid ,
+        o.number ,
+        o.createtime ,
+        o.note
+        FROM
+        USER u
+        JOIN orders o ON u.id = o.user_id;
+    </select>
+
+    <resultMap id="resultMap_user_ordersList" type="user">
+        <id column="id" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="birthday" property="birthday"></result>
+        <result column="sex" property="sex"></result>
+        <result column="address" property="address"></result>
+        <collection property="ordersList" ofType="orders">
+            <id column="oid" property="id"></id>
+            <result column="number" property="number"></result>
+            <result column="createtime" property="createtime"></result>
+            <result column="note" property="note"></result>
+        </collection>
+    </resultMap>
+</mapper>

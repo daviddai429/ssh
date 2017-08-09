@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mybatis.mapper.OrdersMapper">
+    <!--查询orders-->
+    <select id="getOrdersList" resultMap="resultMap_getOrdersList_orders">
+         SELECT
+            *
+        FROM
+            orders;
+    </select>
+    <!--单表-->
+    <resultMap id="resultMap_getOrdersList_orders" type="orders">
+        <!--主键-->
+        <id column="id" property="id"></id>
+        <result column="user_id" property="userId"></result>
+    </resultMap>
+    <!--关联查询-->
+    <select id="findOrdersList" resultMap="resultMap_orders_list">
+        SELECT
+            orders.*,
+            user.username,
+            user.address
+        FROM
+            orders,	user
+        WHERE orders.user_id = user.id
+    </select>
+    <resultMap id="resultMap_orders_list" type="orders">
+        <id column="id" property="id"></id>
+        <result column="user_id" property="userId"></result>
+        <result column="number" property="number"></result>
+        <result column="createtime" property="createtime"></result>
+        <result column="note" property="note"></result>
+        <!--配置一对一-->
+        <association property="user" javaType="com.itheima.mybatis.pojo.User">
+            <id column="user_id" property="id"></id>
+            <result column="username" property="username"></result>
+            <result column="address" property="address"></result>
+        </association>
+    </resultMap>
+
+</mapper>
