@@ -62,7 +62,7 @@
         SELECT
         u.id ,
         u.username ,
-        u.birthday ,
+
         u.sex ,
         u.address ,
         o.id as oid ,
